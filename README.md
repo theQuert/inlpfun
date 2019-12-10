@@ -1046,4 +1046,4 @@ For personal communication related to BERT, please contact Jacob Devlin
 Kenton Lee (`kentonl@google.com`).
 
 ## Credits
-(google-research)[https://github.com/google-research/bert]
+#### [google-research](https://github.com/google-research/bert)
