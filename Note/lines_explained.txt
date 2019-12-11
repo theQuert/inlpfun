@@ -1,0 +1,30 @@
+# 1st
+# Preprocessing(warmup_steps, token_type, truncate)
+# Modeling (WE, TE, PE, word embedding, attention, residual, QKV, softmax)
+
+# run_classifier
+# 848-856	 9
+# 484-513	30
+# 377-398	22
+# 399-407	 9
+# 564-578	15
+# 409-481	73
+# 581-590	10
+
+# tokenization
+# 170-178	 9
+
+# modeling
+# 163-183	21
+# 404-435	32
+# 480-500	21
+# 502-535	34
+# 199-222	24
+# 823-848	26
+# 850-872	23
+# 646-723	80
+# 725-775	51
+
+#-------------489
+
+# 2nd
