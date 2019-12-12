@@ -43,7 +43,7 @@ def validate_case_matches_checkpoint(do_lower_case, init_checkpoint):
   model_name = m.group(1)
 
   lower_models = [
-      "uncased_L-24_H-1024_A-16", "uncased_L-12_H-768_A-12",
+      "uncased_L-24_H-1024_A-16" , "uncased_L-12_H-768_A-12",
       "multilingual_L-12_H-768_A-12", "chinese_L-12_H-768_A-12"
   ]
 
@@ -63,7 +63,7 @@ def validate_case_matches_checkpoint(do_lower_case, init_checkpoint):
     is_bad_config = True
     actual_flag = "True"
     case_name = "cased"
-    opposite_flag = "False"
+   ` opposite_flag = "False"
 
   if is_bad_config:
     raise ValueError(

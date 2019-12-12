@@ -490,7 +490,7 @@ def file_based_convert_examples_to_features(
 
         # Create features for each epochs
   for (ex_index, example) in enumerate(examples):
-    if ex_index % 10000 == 0: # Pring log for every 10000 epochs
+    if ex_index % 10000 == 0: # Printing log every 10000 epochs
       tf.logging.info("Writing example %d of %d" % (ex_index, len(examples)))
 
     feature = convert_single_example(ex_index, example, label_list,

@@ -883,7 +883,7 @@ def transformer_model(input_tensor,
           attention_output = tf.concat(attention_heads, axis=-1)
 
         # Run a linear projection of `hidden_size` then add a residual
-        # with `layer_input`.
+        # with `layer_input`. [1024, 768]
         with tf.variable_scope("output"):
           attention_output = tf.layers.dense(
               attention_output,
@@ -899,15 +899,16 @@ def transformer_model(input_tensor,
             intermediate_size,
             activation=intermediate_act_fn,
             kernel_initializer=create_initializer(initializer_range))
-
+      # [1024, 3072]
       # Down-project back to `hidden_size` then add the residual.
+      # FCL contains 3072, project back to 768
       with tf.variable_scope("output"):
         layer_output = tf.layers.dense(
             intermediate_output,
             hidden_size,
             kernel_initializer=create_initializer(initializer_range))
         layer_output = dropout(layer_output, hidden_dropout_prob)
-        # Residual conection
+        # Residual Connection
         layer_output = layer_norm(layer_output + attention_output)
         prev_output = layer_output
         all_layer_outputs.append(layer_output)
