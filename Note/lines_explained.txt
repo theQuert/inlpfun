@@ -1,4 +1,6 @@
-# 1st
+# Pre-trained model for BERT
+
+# 1st_20191210
 # Preprocessing(warmup_steps, token_type, truncate)
 # Modeling (WE, TE, PE, word embedding, attention, residual, QKV, softmax)
 
@@ -23,8 +25,13 @@
 # 823-848	26
 # 850-872	23
 # 646-723	80
-# 725-775	51
+# 726-776	51
 
 #-------------489
 
-# 2nd
+# 2nd_20191217
+
+# modeling
+# 765-776
+# 888-
+# 646-652
