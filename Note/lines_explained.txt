@@ -33,6 +33,7 @@
 #-------------489
 
 # 2nd_20191217
+# Transformer (Residual Connection, Fully Connection Layer, Loss Function)
 
 # run_classifier
 # 450
@@ -43,4 +44,14 @@
 
 # run_classifier
 # 597
+
+# modeling
+# 209-233
+
+# run_classifier
+# 599-607
+# 609-624
+
+# run_classifier_customized
+# 206-224
 
