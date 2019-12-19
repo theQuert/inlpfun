@@ -202,6 +202,38 @@ class DataProcessor(object):
       for line in reader:
         lines.append(line)
       return lines
+  
+  # Customized Processor
+class MyProcessor(DataProcessor):
+  """Base class for data converters for sequence classification data sets."""
+
+  def get_train_examples(self, data_dir):
+    """Gets a collection of `InputExample`s for the train set."""
+    file_path = os.path.join(data_dir, 'training_set.txt')
+    f = open(file_path, 'r', encoding = 'utf-8')
+    train_data = []
+    index = 0
+    for line in f.readlines():
+         guid = "train-%d" % (index)
+         line = line.replace('\n', '').split('\t')
+         text_a = tokenization.convert_to_unicode(str(line[1]))
+         label = str(line[2])
+         train_data.append(
+             InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
+         index += 1
+    return train_data
+
+  def get_dev_examples(self, data_dir):
+    """Gets a collection of `InputExample`s for the dev set."""
+    raise NotImplementedError()
+
+  def get_test_examples(self, data_dir):
+    """Gets a collection of `InputExample`s for prediction."""
+    raise NotImplementedError()
+
+  def get_labels(self):
+    """Gets the list of labels for this data set."""
+    raise NotImplementedError()
 
 
 class XnliProcessor(DataProcessor):
