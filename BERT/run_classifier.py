@@ -395,7 +395,7 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
   tokens_b = None
   if example.text_b:
     tokens_b = tokenizer.tokenize(example.text_b) # Tokens of 2nd sentence
-        # which has already convert to WordPiece structure
+        # which has converted to WordPiece structure.
   if tokens_b:
     # Modifies `tokens_a` and `tokens_b` in place so that the total
     # length is less than the specified length.
@@ -445,8 +445,6 @@ def convert_single_example(ex_index, example, label_list, max_seq_length,
 
   # The mask has 1 for real tokens and 0 for padding tokens. Only real
   # tokens are attended to.
-  # Assert input_mask which has real vector * mask[1], that would help self-attention 
-  # skip padding mask.(Preparing for self-attention)
   input_mask = [1] * len(input_ids)
 
   # Zero-pad up to the sequence length.
