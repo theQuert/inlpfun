@@ -63,7 +63,7 @@ def validate_case_matches_checkpoint(do_lower_case, init_checkpoint):
     is_bad_config = True
     actual_flag = "True"
     case_name = "cased"
-   ` opposite_flag = "False"
+    opposite_flag = "False"
 
   if is_bad_config:
     raise ValueError(
