@@ -34,6 +34,7 @@ https://github.com/tensorflow/models/tree/master/official/transformer
 https://github.com/osmr/imgclsmob
 
 # Visualizing Attention in Transformer-Based Language Representation Models
+# Representation Learning- A Review and New Perspectives
 
 # Dropout- A Simple Way to Prevent Neural Networks from Overfitting
 (A1781)
