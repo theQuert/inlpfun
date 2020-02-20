@@ -60,6 +60,10 @@ https://github.com/jadevaibhav/Brain-Tumor-Segmentation-using-Deep-Neural-networ
 (A1775)
 https://github.com/google/trax
 
+# LARGE BATCH OPTIMIZATION FOR DEEP LEARNING:
+TRAINING BERT IN 76 MINUTES (A1774)
+https://github.com/microsoft/DeepSpeed
+
 # CS224U - Natural Language Understanding
 https://www.youtube.com/watch?v=tZ_Jrc_nRJY&list=PLoROMvodv4rObpMCir6rNNUlFAn56Js20
 http://web.stanford.edu/class/cs224u/
