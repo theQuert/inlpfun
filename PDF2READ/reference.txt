@@ -64,6 +64,16 @@ https://github.com/google/trax
 TRAINING BERT IN 76 MINUTES (A1774)
 https://github.com/microsoft/DeepSpeed
 
+# Google’s Neural Machine Translation System- Bridging the Gap between Human and Machine Translation (A1773)
+https://github.com/google/sentencepiece
+https://github.com/guillaume-chevalier/LSTM-Human-Activity-Recognition
+
+# Pointer Sentinel Mixture Models (A1772)
+https://github.com/elanmart/psmm
+
+# Probing Neural Network Comprehension of Natural Language Arguments (A1771)
+https://github.com/IKMLab/arct2
+
 # CS224U - Natural Language Understanding
 https://www.youtube.com/watch?v=tZ_Jrc_nRJY&list=PLoROMvodv4rObpMCir6rNNUlFAn56Js20
 http://web.stanford.edu/class/cs224u/
