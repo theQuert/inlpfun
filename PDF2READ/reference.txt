@@ -74,6 +74,8 @@ https://github.com/elanmart/psmm
 # Probing Neural Network Comprehension of Natural Language Arguments (A1771)
 https://github.com/IKMLab/arct2
 
+# Efficient Estimation of Word Representations in Vector Space(word2vec) (A1770)
+
 # CS224U - Natural Language Understanding
 https://www.youtube.com/watch?v=tZ_Jrc_nRJY&list=PLoROMvodv4rObpMCir6rNNUlFAn56Js20
 http://web.stanford.edu/class/cs224u/
@@ -87,6 +89,11 @@ https://github.com/chiphuyen/stanford-tensorflow-tutorials
 # CS224d - Deep Learning for Natural Language Processing
 https://cs224d.stanford.edu
 https://github.com/bogatyy/cs224d
+
+# CS224N - NLP with Deep Learning
+http://cs224n.stanford.edu/
+https://www.youtube.com/playlist?list=PLoROMvodv4rOhcuXMZkNm7j3fVwBBY42z
+https://github.com/hankcs/CS224n
 
 # CS50 
 https://cs50.harvard.edu/college/
