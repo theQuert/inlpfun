@@ -47,4 +47,10 @@ paths = motorcar.hypernym_paths()
 panda = wn.synset('panda.n.01')
 hyper = lambda s: s.hypernyms()
 list(panda.closure(hyper))            
-        
+
+
+from nltk.corpus import wordnet as wn
+poses = {'n': 'noun', 'v': 'verb', 's': 'adj (s)', 'a': 'adj', 'r': 'adv'}
+for synset in wn.synsets("good"):
+    print("[}: {}".format(poses[synset.pos()]))
+    
