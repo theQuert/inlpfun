@@ -81,6 +81,11 @@ https://www.youtube.com/watch?v=tZ_Jrc_nRJY&list=PLoROMvodv4rObpMCir6rNNUlFAn56J
 http://web.stanford.edu/class/cs224u/
 https://github.com/cgpotts/cs224
 
+# CS230 - Deep Learning
+https://www.youtube.com/watch?v=PySo_6S4ZAg&list=PLoROMvodv4rOABXSygHTsbvUz4G_YQhOb
+https://cs230.stanford.edu/
+https://github.com/cs230-stanford/cs230-code-examples
+
 # CS20 - Tensorflow for Deep Learning Research
 https://web.stanford.edu/class/cs20si/
 https://github.com/aisolab/CS20
