@@ -16,6 +16,9 @@ https://www.youtube.com/watch?v=hSXFuypLukA&list=PLJV_el3uVTsPy9oCRY30oBPNLCo89y
 https://www.youtube.com/watch?v=X7PH3NuYW0Q&list=PLJ Semi-supervised Learning (ML Lecture 12) [15-semi (v3).pdf]
 https://www.youtube.com/watch?v=fX_guE7JNnY&list=PLJV_el3uVTsPy9oCRY30oBPNLCo89yu49&index=21
 
+#f Recurrent Neural Network (ML Lecture 21) [13-RNN (v2).pdf]
+https://www.youtube.com/watch?v=xCGidAeyS4M&list=PLJV_el3uVTsPy9oCRY30oBPNLCo89yu49&index=30
+
 #o Semi-supervised Learning (ML Lecture 12) [15-semi (v3).pdf]
 https://www.youtube.com/watch?v=fX_guE7JNnY&list=PLJV_el3uVTsPy9oCRY30oBPNLCo89yu49&index=21
 
