@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__author__ = "the-Quert (github.com/the-Quert)"
+__author__ = "the-Quert (github.com/the-quert)"
 import warnings
 warnings.filterwarnings(action = 'ignore', category = UserWarning, module = 'gensim')
 from gensim.models.keyedvectors import KeyedVectors
