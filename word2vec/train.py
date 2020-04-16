@@ -15,7 +15,7 @@ class Train(object):
 	def train(self):
 		print("Training...")
 		# Load file
-		sentence = word2vec.Text8Corpus("/content/drive/My Drive/LAB/word2vec/segmentation.txt")
+		sentence = word2vec.Text8Corpus("~/Downloads/segmentation.txt")
 		# Setting degree and Produce Model(Train)
 		# model = word2vec.Word2Vec(sentence, size = 300, window = 10, min_count = 5, workers = 4, sg = 1)
 		model = word2vec.Word2Vec(sentence, size = 150, window = 10, min_count = 5, workers = 4, sg = 1)
