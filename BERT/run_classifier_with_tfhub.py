@@ -59,6 +59,7 @@ def create_model(is_training, input_ids, input_mask, segment_ids, labels,
 
   hidden_size = output_layer.shape[-1].value
 
+  # Create customized layer to fine-tune downstream tasks
   output_weights = tf.get_variable(
       "output_weights", [num_labels, hidden_size],
       initializer=tf.truncated_normal_initializer(stddev=0.02))
