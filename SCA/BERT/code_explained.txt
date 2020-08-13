@@ -1,6 +1,5 @@
 # Pre-trained model for BERT
 
-# 1st_20191210
 # Preprocessing(warmup_steps, token_type, truncate)
 # Modeling (WE, TE, PE, word embedding, attention, residual, QKV, softmax)
 
@@ -32,7 +31,6 @@
 
 #-------------489
 
-# 2nd_20191217
 # Transformer (Residual Connection, Fully Connection Layer, Loss Function)
 
 # run_classifier
@@ -57,3 +55,6 @@
 
 # run_classifier_with_tfhub
 * create_model
+
+# create_pretraining_data
+# 
