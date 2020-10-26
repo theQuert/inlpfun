@@ -168,32 +168,32 @@ class EncoderLayer(nn.Module):eed_forward, dropout):
 		of the sub-layers, followed the layer norm.
 	'''
 	
-	class DecoderLayer(nn.Module):
-		'''
-			Decoder includes self-attn, src-attn, and feed forward
-		'''
-		def __init__(self, size, self_attn, src_attn, feed_forward, dropout):
-			super(DecoderLayer, self).__init__()
-			self.size = size
-			self.self_attn = self_attn
-			self.src_attn = src_attn
-			self.feed_forward = feed_forward
-			self.sublayer = clones(SublayerConnection(size, dropout), 3)
+class DecoderLayer(nn.Module):
+	'''
+		Decoder includes self-attn, src-attn, and feed forward
+	'''
+	def __init__(self, size, self_attn, src_attn, feed_forward, dropout):
+		super(DecoderLayer, self).__init__()
+		self.size = size
+		self.self_attn = self_attn
+		self.src_attn = src_attn
+		self.feed_forward = feed_forward
+		self.sublayer = clones(SublayerConnection(size, dropout), 3)
 
-		def forward(self, x, memory, src_mask, tgt_mask):
-			m = memory
-			x = self.sublayer[0](x, lambda x: self.self_attn(x, x, x, tgt_mask))
-			x = self.sublayer[1](x, lambda x: self.src_attn(x, m, m, src_mask))
-			return self.sublayer[2](x, self.feed_forward)
+	def forward(self, x, memory, src_mask, tgt_mask):
+		m = memory
+		x = self.sublayer[0](x, lambda x: self.self_attn(x, x, x, tgt_mask))
+		x = self.sublayer[1](x, lambda x: self.src_attn(x, m, m, src_mask))
+		return self.sublayer[2](x, self.feed_forward)
 
-		''' 
-			Prevent positions from attending to subsequent positions
-			"i" can only depend on the known outputs at positions less than "i"
-		'''
-		def subsequent_mask(size):
-			attn_shape = (1, size, size)
-			subsequent_mask = np.triu(np.ones(attn_shape), k = 1).astype('uint8')
-			return torch.from_numpy(subsequent_mask) == 0
+	''' 
+		Prevent positions from attending to subsequent positions
+		"i" can only depend on the known outputs at positions less than "i"
+	'''
+	def subsequent_mask(size):
+		attn_shape = (1, size, size)
+		subsequent_mask = np.triu(np.ones(attn_shape), k = 1).astype('uint8')
+		return torch.from_numpy(subsequent_mask) == 0
 
 # Attention
 def attention(query, key, value, mask=None, dropout=None):
