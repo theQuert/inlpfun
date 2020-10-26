@@ -25,11 +25,12 @@ class PositionalEncoding(nn.Module)
 		pe[:, 1::2] = torch.cos(position * div_term)
 		pe.unsqueeze(0)
 		self.register_buffer['pe', pe]		
-		
+
 		# Feed Forward : Resicual Connection
 	def forward(self, x):
 		x = x + Variable(self.pe[:, :x.size(1)], requires_grad = False)
 		return self.dropout(x)
+# Input Tensor (Word Embedding + Position Embedding = Word Representation) (batch_size, seq_len, d_model)
 
 class EncoderDecoder(nn.Module):
 	def __init__(self, encoder, decoder, src_embed, tgt_embed, generator):
@@ -63,7 +64,14 @@ def clones(module, N):
 	"Produce N idendical layers."
 	return nn.ModuleList([copy.deepcopy(module)] for _ in range(N))
 
+
 # Encoder
+# Each Encoder Layer includes (Multi-Head Attention + Residual Connection + LayerNorm + Feed Forward)
+# To sum up -> Each Encoder layer includes (self_attn + feed_forward)
+
+'''
+	Core encoder is a stack of N layers
+'''
 
 class Encoder(nn.Module):
 	def __init__(self, layer, N):
@@ -106,8 +114,22 @@ class SublayerConnection(nn.Module):
 		Each layer has two sub-layers. The first is a multi-head attention, and the second is a simple position-wise
 		fully connected feed-forward network
 	'''
-class EncoderLayer(nn.Module):
-	def __init__(self, size, self_attn, feed_forward, dropout):
+	'''
+		Sub-layers includes [Multi-Head + Residual Connection + LayerNorm]
+							[Feed Forward + Residual Connection]
+	'''
+	'''
+		1. Multi-Head Attention / Feed Forward 
+		2. Residual Connection
+		3. LayerNorm
+	'''
+	'''
+		size: d_model, we use 512
+		self_attn: The instance of "MultiHeadAttention", sublayer[0]
+		feed_forward: The instance of "PositionwiseFeedForward", sublayer[1]
+		dropout: The dropout rate, nn.Dropout
+	'''
+class EncoderLayer(nn.Module):eed_forward, dropout):
 		super(EncoderLayer, self).__init__()
 		self.self_attn = self_attn
 		self.feed_forward = feed_forward
