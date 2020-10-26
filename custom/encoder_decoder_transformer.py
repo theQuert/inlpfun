@@ -9,6 +9,19 @@ class Embeddings(nn.Module):
 	def forward(self, x):
 		return self.lut(x) * math.sqrt(self.d_model)
 
+# Add Postion Encoding to "Embedding"
+class PositionalEncoding(nn.Module)
+	def __init__(self, d_model, dropout, max_len = 500):
+		super(PositionalEncoding, self).__init__()
+		self.dropout = nn.Dropout(p=dropout)
+
+		# Compute the positional emcodings in log space
+		pe = torch.zeros(max_len, d_model)
+		position = torch.arange(0, max_len).unsqueeze(1)
+		dev_term = torch.exp(torch.arange(0, d_model, 2) * 
+								-(math.log(10000.0) / d_model))
+		
+
 class EncoderDecoder(nn.Moddule):
 	def __init__(self, encoder, decoder, src_embed, tgt_embed, generator):
 		super(EncoderDecoder, self).__init__()
