@@ -1,5 +1,6 @@
 # Build the lookup table (Embeddings)
 # nn.Embeddings(num_embedding, embedding_dim)
+# d_model = 512
 class Embeddings(nn.Module):
 	def __init__(self, d_model, vocab):
 		super(Embeddings, self).__init__()
@@ -18,11 +19,19 @@ class PositionalEncoding(nn.Module)
 		# Compute the positional emcodings in log space
 		pe = torch.zeros(max_len, d_model)
 		position = torch.arange(0, max_len).unsqueeze(1)
-		dev_term = torch.exp(torch.arange(0, d_model, 2) * 
+		div_term = torch.exp(torch.arange(0, d_model, 2) * 
 								-(math.log(10000.0) / d_model))
+		pe[:, 0::2] = torch.sin(position * div_term)
+		pe[:, 1::2] = torch.cos(position * div_term)
+		pe.unsqueeze(0)
+		self.register_buffer['pe', pe]		
 		
+		# Feed Forward : Resicual Connection
+	def forward(self, x):
+		x = x + Variable(self.pe[:, :x.size(1)], requires_grad = False)
+		return self.dropout(x)
 
-class EncoderDecoder(nn.Moddule):
+class EncoderDecoder(nn.Module):
 	def __init__(self, encoder, decoder, src_embed, tgt_embed, generator):
 		super(EncoderDecoder, self).__init__()
 		self.encoder = encoder
