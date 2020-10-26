@@ -209,19 +209,21 @@ class MyProcessor(DataProcessor):
 
   def get_train_examples(self, data_dir):
     """Gets a collection of `InputExample`s for the train set."""
-    file_path = os.path.join(data_dir, 'training_set.txt')
-    f = open(file_path, 'r', encoding = 'utf-8')
-    train_data = []
-    index = 0
-    for line in f.readlines():
-         guid = "train-%d" % (index)
-         line = line.replace('\n', '').split('\t')
-         text_a = tokenization.convert_to_unicode(str(line[1]))
-         label = str(line[2])
-         train_data.append(
-             InputExample(guid=guid, text_a=text_a, text_b=None, label=label))
-         index += 1
-    return train_data
+    file_path = os.path.join(data_dir, 'train.tsv')
+    with open(file_path, 'r', encoding = 'utf-8') as f:
+    	reader = f.readlines()
+    exmaples = []
+    for(i, line) in enumerate(reader):
+      guid = 'train-%d' % index
+      split_line = line.strip().split("\t")
+      print(split_line)
+      text_a = tokenization.convert_to_unicode(split_line[1])
+    	text_b = tokenization.convert_to_unicode(split_line[2])
+      label = split_line[3]
+      examples.append(InputExample(guid = guid, text_a = text_a, text_b = text_b, label = label))
+
+    return examples
+    
 
   def get_dev_examples(self, data_dir):
     """Gets a collection of `InputExample`s for the dev set."""
