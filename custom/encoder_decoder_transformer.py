@@ -17,6 +17,8 @@ class PositionalEncoding(nn.Module)
 		self.dropout = nn.Dropout(p=dropout)
 
 		# Compute the positional emcodings in log space
+		# PE(pos, 2*i) = sin(pos/(10000^(2*i/d_model)))
+		# PE(pos, 2*i+1) = cos(pos/(10000^(2*i/d_model)))
 		pe = torch.zeros(max_len, d_model)
 		position = torch.arange(0, max_len).unsqueeze(1)
 		div_term = torch.exp(torch.arange(0, d_model, 2) * 
@@ -31,7 +33,7 @@ class PositionalEncoding(nn.Module)
 		x = x + Variable(self.pe[:, :x.size(1)], requires_grad = False)
 		return self.dropout(x)
 # Input Tensor (Word Embedding + Position Embedding = Word Representation) (batch_size, seq_len, d_model)
-
+# d_model = 512
 class EncoderDecoder(nn.Module):
 	def __init__(self, encoder, decoder, src_embed, tgt_embed, generator):
 		super(EncoderDecoder, self).__init__()
@@ -64,6 +66,18 @@ def clones(module, N):
 	"Produce N idendical layers."
 	return nn.ModuleList([copy.deepcopy(module)] for _ in range(N))
 
+class LayerNorm(nn.Module):
+	def __init__(self, features, eps=1e-6):
+		super(LayerNorm, self).__init__()
+		self.a_2 = nn.Parameter(torch.ones(features))
+		self.b_2 = nn.Parameter(torch.zeros(features))
+		self.eps = eps
+
+	def forward(self, x):
+		mean = x.mean(-1, keep_dim=True)
+		std = x.std(-1, keepdim=True)
+		return self.a_2 * (x - mean) / (std + self.eps) + self.b_2
+
 
 # Encoder
 # Each Encoder Layer includes (Multi-Head Attention + Residual Connection + LayerNorm + Feed Forward)
@@ -85,17 +99,26 @@ class Encoder(nn.Module):
 			x = layer(x, mask)
 		return self.norm(x)
 
-class LayerNorm(nn.Module):
-	def __init__(self, features, eps=1e-6):
-		super(LayerNorm, self).__init__()
-		self.a_2 = nn.Parameter(torch.ones(features))
-		self.b_2 = nn.Parameter(torch.zeros(features))
-		self.eps = eps
 
-	def forward(self, x):
-		mean = x.mean(-1, keep_dim=True)
-		std = x.std(-1, keepdim=True)
-		return self.a_2 * (x - mean) / (std + self.eps) + self.b_2
+class EncoderLayer(nn.Module):
+	def __init__(self, size, self_attn, feed_forward, dropout):
+		super(EncoderLayer, self).__init__()
+		self.self_attn = self_attn
+		self.feed_forward = feed_forward
+		# 2 sublayers
+		self.sublayer = clones(SublayerConnection(size, dropout), 2)
+		self.size = size
+	'''
+		Attention and Feed_forward
+	'''
+	'''
+		In the beginning, each x is the representation of the sentence.
+		Between EncoderLayers, each "x" is is the output of the previous layer.
+	'''
+
+	def forward(self, x, mask):
+		x = self.sublayer[0](x, lambda x: self.self_attn(x, x, x, mask))
+		return self.sublayer[1](x, self.feed_forward)
 
 class SublayerConnection(nn.Module):
 	''' A residual connection followed by a layer norm.
@@ -129,20 +152,6 @@ class SublayerConnection(nn.Module):
 		feed_forward: The instance of "PositionwiseFeedForward", sublayer[1]
 		dropout: The dropout rate, nn.Dropout
 	'''
-class EncoderLayer(nn.Module):eed_forward, dropout):
-		super(EncoderLayer, self).__init__()
-		self.self_attn = self_attn
-		self.feed_forward = feed_forward
-		# 2 sublayers
-		self.sublayer = clones(SublayerConnection(size, dropout), 2)
-		self.size = size
-	'''
-		Attention and Feed_forward
-	'''
-
-	def forward(self, x, mask):
-		x = self.sublayer[0](x, lambda x: self.self_attn(x, x, x, mask))
-		return self.sublayer[1](x, self.feed_forward)
 
 # Decoder
 	'''
@@ -196,6 +205,33 @@ class DecoderLayer(nn.Module):
 		return torch.from_numpy(subsequent_mask) == 0
 
 # Attention
+class MultiHeadAttention(nn.Module):
+	def __init__(self, h, d_model, dropout = 0.1):
+		super(MultiHeadAttention, self).__init__()
+		assert d_model % h == 0
+		'''
+			We assume d_v always equal to d_k
+		'''
+		'''
+			h = 8: We have 8 parallel attention layers / heads
+			For each layer/head: We use d_k = d_v = d_model / h = 512 / 8 = 64
+		'''
+
+		self.d_k = d_model // h
+		self.h = h
+		self.linears = clones(nn.Linear(d_model, d_model), 4)
+		self.attn = None
+		self.dropout = nn.Dropout(p=dropout)
+
+	def forward(self, query, key, value, mask=None):
+		if mask is not None:
+			mask = mask.unsqueeze(1)
+		nbatches = query.size(0)
+
+
+
+
+
 def attention(query, key, value, mask=None, dropout=None):
 	''' 
 		Compute "Scaled Dot Product Attention"
@@ -204,9 +240,10 @@ def attention(query, key, value, mask=None, dropout=None):
 	scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(d_k)
 	if mask is not None:
 		scores = scores.masked_fill(mask == 0, -1e9)
-
+	
 	p_attn = F.softmax(scores, dim = -1)
 
 	if dropout is not None:
 		p_attn = dropout(p_attn)
+	return torch.matmul(p_attn, value), p_attn
 
