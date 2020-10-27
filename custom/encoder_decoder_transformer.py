@@ -1,3 +1,5 @@
+import torch
+import torch.nn.functional as F
 # Build the lookup table (Embeddings)
 # nn.Embeddings(num_embedding, embedding_dim)
 # d_model = 512
@@ -60,7 +62,7 @@ class Generator(nn.Module):
 		self.proj = nn.Linear(d_model, vocab)
 
 	def forward(self, x):
-		return F.log_softmax(self.proj(x), dim=1)
+		return F.log_softmax(self.proj(x), dim=-1)
 
 def clones(module, N):
 	"Produce N idendical layers."
@@ -291,33 +293,102 @@ def attention(query, key, value, mask=None, dropout=None):
 	[nbatches, 8, L, 64] * [nbatches, 8, 64, L] = [nbatches, 8, L, L]
 	[nbatches, 8, L, L] * [nbatches, 8, L, 64] = [nbatches, 8, L, 64]
 '''
-
 class PositionwiseFeedForward(nn.Module):
 	'''
+		Second sub-layer of Encoder
 		Implement FFN equation
+	'''	
 	'''
+		FFN(x) = max(0, w_1*x + b1)*w_2 + b_2
+	'''
+	def __init__(self, d_model, d_ff, dropout=0.1):
+		super(PositionwiseFeedForward, self).__init__()
+		self.w_1 = nn.Linear(d_model, d_ff)
+		self.w_2 = nn.Linear(d_ff, d_model)
+		self.dropout = nn.Dropout(dropout)
+
+	def forward(self, x):
+		return self.w_2(self.dropout(F.relu(w_1(x))))
+
+# Decoder
+'''
+	Sub-layers of Decoder:
+		1) Masked Multi-Headed Attention
+		2) Encoder-Decoder Attention
+		3) LinearLayer, used to predict probabilities of words
+'''
+
+	if mask is not None:
+		scores = scores.masked_fill(mask == 0, -1e9)
+
+class DecoderLayer(nn.Module):
+	'''
+		Decoder includes self-attn, src_attn, and feed forward
+	'''
+	def __init__(self, size, self_attn, src_attn, feed_forward, dropout):
+		super(DecoderLayer, self).__init__()
+		self.size = size
+		self.self_attn = self_attn
+		self.src_attn = src_attn
+		self.feed_forward = feed_forward
+		self.sublayer = SublayerConnection((size, dropout), 3)
+
+	def forward(self, x, memory, src_mark, tgt_mask):
+
+		'''
+			"m" is the output from Encoder
+			"x" is from the last DecoderLayer
+			"Encoder-Decoder Attention" is composed of "m" and "x" from Encoder and previous DecoderLayer respectively
+		'''
+		'''
+			In self-attention layer, all of the queries, keys, values come from the same place, 
+			-> Each position in the encoder can attend to all positions in the previous layer of the encoder
+		'''
+		'''
+			Self-attention layer in the decoder also allow each positon in the decoder to attend to all positions in the 
+			decoder up and including that position.
+
+			We need to prevent leftward information flow in the decoder to preserve the auto-regressive property.
+			We implement this inside of scaled dot-product attention by masking out all values in the input of the softmax
+			which correspond to illegal connections.
+		'''
+		m = memory
+		x = self.sublayer[0](x, lambda x: self.self_attn(x, x, x, tgt_mask))
+		x = self.sublayer[1](x, lambda x: self.stc_attn(m, m, m, src_mask))
+		return self.sublayer[2](x, self.feed_forward)
 
 
+class Generator(nn.Module):
+	'''
+		Define standard linear + softmax generation step
+	'''
+	def __init__(self, d_model, vocab):
+		super(Generator, self).__init__()
+		self.proj = nn.Linear(d_model, vocab)
 
+	def forward(self, x):
+		return F.softmax(self.proj(x), dim=-1)
 
+# Full Model
+def make_model(src_vocab, tgt_vocab, N = 6, d_model = 512, d_ff = 2048, h = 8, dropout = 0.1):
+	'''
+		Produce model with hyperparameters
+	'''
+	c = copy.deepcopy
+	attn = MultiHeadAttention(h, d_model)
+	ff = PositionwiseFeedForward(d_model, d_ff, dropout) 
+	position = PositionalEncoding(d_model, dropout)
+	model = EncoderDecoder(
+		Encoder(EncoderLayer(d_model, c(attn), c(ff), dropout), N),
+		Decoder(DecoderLayer(d_model, c(attn), c(attn), c(ff), dropout), N),
+	nn.Sequential(Embeddings(d_model, src_vocab), c(position)),
+	nn.Sequential(Embeddings(d_model, tgt_vocab), c(position)),
+	Generator(d_model, tgt_vocab))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	for p in model.parameters():
+		if p.dim() > 1:
+			nn.init.xavier_uniform(p)
+	return model
 
 
 
