@@ -210,15 +210,16 @@ class MultiHeadAttention(nn.Module):
 		super(MultiHeadAttention, self).__init__()
 		assert d_model % h == 0
 		'''
-			We assume d_v always equal to d_k
+			We assume d_k always equal to d_v
 		'''
 		'''
-			h = 8: We have 8 parallel attention layers / heads
+			h = 8: We have 8 parallel attention layers / "heads"
 			For each layer/head: We use d_k = d_v = d_model / h = 512 / 8 = 64
+			dropout rate = 0.1
 		'''
-
-		self.d_k = d_model // h
+		
 		self.h = h
+		self.d_k = d_model // h
 		self.linears = clones(nn.Linear(d_model, d_model), 4)
 		self.attn = None
 		self.dropout = nn.Dropout(p=dropout)
@@ -228,22 +229,95 @@ class MultiHeadAttention(nn.Module):
 			mask = mask.unsqueeze(1)
 		nbatches = query.size(0)
 
+		'''
+			Line #120: 
+				lambda x: self.self_attn(x, x, x, mask)
 
-
-
+			"x" is the embedding of initialized sentence or previous layer output from EncoderLayer
+			Shape of "query": [nbatches, L, d_model] = [nbatches, L, 512]
+		'''
+		'''
+			0) Do linear transform to "query", "key", "value" -> Shape of them: [nbatches, L, 512]
+			1) Use "view()" to reshape -> Shape of them: [nbatches, L, 8, 64], d_k = 512 / 8 = 64
+			2) Use "transpose()" to swap dim_1 and dim_2 -> Shape of them: [nbatches, 8, L, 64]
+		'''
+		query, key, value = [l(x)view(nbatches, -1, self.h, self.d_k).transpose(1, 2)
+							for l, x in zip(self.linears, (query, key, value))]
+		x, self_attn = attention(query, key, value, mask = mask, dropout = self.dropout)
+		x = x.transpose(1, 2).contiguous().view(nbatches, -1, self.h * self.d_k)
+		return self.linear[-1](x)
+		
 
 def attention(query, key, value, mask=None, dropout=None):
 	''' 
 		Compute "Scaled Dot Product Attention"
 	'''
 	d_k = query.size(-1)
-	scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(d_k)
+	'''
+		query * key.transpose(-2, -1):
+			[nbatches, 8, L, 64] * [nbatches, 8, 64, L] = [nbatches, 8, L, L]
+		Do softmax to scores
+		Shape of "p_attn" is [nbatches, 8, L, L]
+		Shape of "value" is [nbatches, 8, L, 64]
+		Shape of matmul(p_attn, value) is [nbatches, 8, L, 64]	
+
+		We have 8 heads done with different matmul -> Get different "representation subspace"
+	'''
+	scores = torch.matmul(query, key.transpose(-2, -1) / math.sqrt(d_k))
 	if mask is not None:
 		scores = scores.masked_fill(mask == 0, -1e9)
-	
 	p_attn = F.softmax(scores, dim = -1)
-
 	if dropout is not None:
 		p_attn = dropout(p_attn)
 	return torch.matmul(p_attn, value), p_attn
+		
+
+
+'''
+	query: [nbatches, L, 512]
+	We have 8 heads: 
+	512 / 8 = 64
+	The shape of query, key, value are [nbatches, L, 8, 64]
+	Then transpose(1, 2) -> [nbatches, 8, L, 64]
+	The shapes of query, key, value are [nbatches, 8, L, 64]
+
+	query * key.transpose(-1, -2)
+	[nbatches, 8, L, 64] * [nbatches, 8, 64, L] = [nbatches, 8, L, L]
+	p_attn = F.softmax(scores)
+	The shape of p_attn = [nbatches, 8, L, L]
+	The shape of value is [nbatches, 8, L, 64]
+
+	[nbatches, L, 512] [nbatches, L, 8, 64] [nbatches, 8, L, 64]
+	[nbatches, 8, L, 64] * [nbatches, 8, 64, L] = [nbatches, 8, L, L]
+	[nbatches, 8, L, L] * [nbatches, 8, L, 64] = [nbatches, 8, L, 64]
+'''
+
+class PositionwiseFeedForward(nn.Module):
+	'''
+		Implement FFN equation
+	'''
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
