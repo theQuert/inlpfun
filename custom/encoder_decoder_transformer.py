@@ -9,6 +9,9 @@ class Embeddings(nn.Module):
 		self.lut = Embedding(vocab, d_model)
 		self.d_model = d_model
 
+'''
+    
+'''
 	def forward(self, x):
 		return self.lut(x) * math.sqrt(self.d_model)
 
@@ -20,17 +23,17 @@ class PositionalEncoding(nn.Module)
 
 		# Compute the positional emcodings in log space
 		# PE(pos, 2*i) = sin(pos/(10000^(2*i/d_model)))
-		# PE(pos, 2*i+1) = cos(pos/(10000^(2*i/d_model)))
+		# PE(pos, (2*i+1)) = cos(pos/(10000^(2*i/d_model)))
 		pe = torch.zeros(max_len, d_model)
-		position = torch.arange(0, max_len).unsqueeze(1)
-		div_term = torch.exp(torch.arange(0, d_model, 2) * 
+		position = torch.arange(0, max_len).unsqueeze(1) # Expand dimension
+		div_term = torch.exp(torch.arange(0, d_model, 2) * # Relative position 
 								-(math.log(10000.0) / d_model))
-		pe[:, 0::2] = torch.sin(position * div_term)
-		pe[:, 1::2] = torch.cos(position * div_term)
+		pe[:, 0::2] = torch.sin(position * div_term) # Select odd row
+		pe[:, 1::2] = torch.cos(position * div_term) # Select even row
 		pe.unsqueeze(0)
-		self.register_buffer['pe', pe]		
+		self.register_buffer['pe', pe]	
 
-		# Feed Forward : Resicual Connection
+		# Feed Forward : Residual Connection
 	def forward(self, x):
 		x = x + Variable(self.pe[:, :x.size(1)], requires_grad = False)
 		return self.dropout(x)
@@ -68,6 +71,10 @@ def clones(module, N):
 	"Produce N idendical layers."
 	return nn.ModuleList([copy.deepcopy(module)] for _ in range(N))
 
+'''
+    Between sublayers, "Residual Connection" and "LayerNorm" are needed
+
+'''
 class LayerNorm(nn.Module):
 	def __init__(self, features, eps=1e-6):
 		super(LayerNorm, self).__init__()
@@ -76,13 +83,28 @@ class LayerNorm(nn.Module):
 		self.eps = eps
 
 	def forward(self, x):
-		mean = x.mean(-1, keep_dim=True)
-		std = x.std(-1, keepdim=True)
-		return self.a_2 * (x - mean) / (std + self.eps) + self.b_2
+        mean = x.mean(-1, keep_dim=True)
+        std = x.std(-1, keep_dim=True)
+        return self.a_2 * (x - mean) / (std + self.eps) + self.b_2
 
+
+class SublayerConnection(nn.Module):
+	'''
+        LayerNorm + Dropout + Residual Connection
+	'''
+	def __init__(self, size, dropout):
+		super(SublayerConnection, self).__init__()
+		self.norm = Laynorm(size)
+		self.dropout = nn.Dropout(dropout)
+
+	def forward(self, x, sublayer):
+		'''  
+            LayerNorm(Residual Connection + Dropout)
+		'''
+		return x + self.dropout(sublayer(self.norm(x)))
 
 # Encoder
-# Each Encoder Layer includes (Multi-Head Attention + Residual Connection + LayerNorm + Feed Forward)
+# Each Encoder Layer includes (Multi-Head Attention + LayerNorm + Dropout + Residual Connection + Feed Forward)
 # To sum up -> Each Encoder layer includes (self_attn + feed_forward)
 
 '''
@@ -97,10 +119,12 @@ class Encoder(nn.Module):
 
 	def forward(self, x, mask):
 		"Pass the input through each layer in turn."
+        ''' 
+            Add sequence and masks to layers
+        '''
 		for layer in self.layers:
 			x = layer(x, mask)
 		return self.norm(x)
-
 
 class EncoderLayer(nn.Module):
 	def __init__(self, size, self_attn, feed_forward, dropout):
@@ -108,6 +132,9 @@ class EncoderLayer(nn.Module):
 		self.self_attn = self_attn
 		self.feed_forward = feed_forward
 		# 2 sublayers
+        '''
+            Deep copy 2 SublayerConnection, 1) one for attention, 2) the other one for simple feed-forward NN
+        '''
 		self.sublayer = clones(SublayerConnection(size, dropout), 2)
 		self.size = size
 	'''
@@ -119,29 +146,19 @@ class EncoderLayer(nn.Module):
 	'''
 
 	def forward(self, x, mask):
+    '''
+        Sublayers for Encoders: 1) For attention. 2) For Feed-Forward NN
+    '''
 		x = self.sublayer[0](x, lambda x: self.self_attn(x, x, x, mask))
 		return self.sublayer[1](x, self.feed_forward)
-
-class SublayerConnection(nn.Module):
-	''' A residual connection followed by a layer norm.
-	'''
-	def __init__(self, size, dropout):
-		super(SublayerConnection, self).__init__()
-		self.norm = Laynorm(size)
-		self.dropout = nn.Dropout(dropout)
-
-	def forward(self, x, sublayer):
-		''' x -> norm(x) -> sublayer -> dropout 
-		'''
-		return x + self.dropout(sublayer(self.norm(x)))
 
 	'''
 		Each layer has two sub-layers. The first is a multi-head attention, and the second is a simple position-wise
 		fully connected feed-forward network
 	'''
 	'''
-		Sub-layers includes [Multi-Head + Residual Connection + LayerNorm]
-							[Feed Forward + Residual Connection]
+		Sub-layers includes [Multi-Head + Residual Connection + sublayer(dropout)+ LayerNorm]
+							[Feed Forward + Residual Connection + sublayer(dropout) + LayerNorm]
 	'''
 	'''
 		1. Multi-Head Attention / Feed Forward 
@@ -166,7 +183,7 @@ class SublayerConnection(nn.Module):
 			self.norm = LayerNorm(layer.size)
 		
 		def forward(self, x, memory, src_mask, tgt_mask):
-			for layer in self.layers:
+			for layer in self.layers: # Add memory, src_mask, tgt_mask for self-attention and Encoder-Decoder Attention
 				x = layer(x, memory, src_mask, tgt_mask)
 			return self.norm(x)
 
@@ -175,8 +192,7 @@ class SublayerConnection(nn.Module):
 		inserts a third sub-layer, which performs multi-head attention over 
 		the output of the encoder stack.
 
-		Similar to the encoder, we also employ residual connection around each
-		of the sub-layers, followed the layer norm.
+        *) LayerNorm(Residual Connecton + Dropout)
 	'''
 	
 class DecoderLayer(nn.Module):
@@ -207,6 +223,34 @@ class DecoderLayer(nn.Module):
 		return torch.from_numpy(subsequent_mask) == 0
 
 # Attention
+
+def attention(query, key, value, mask=None, dropout=None):
+	''' 
+		Compute "Scaled Dot Product Attention"
+	'''
+	d_k = query.size(-1)
+	'''
+		query * key.transpose(-2, -1):
+			[nbatches, 8, L, 64] * [nbatches, 8, 64, L] = [nbatches, 8, L, L]
+		Do softmax to scores
+		Shape of "p_attn" is [nbatches, 8, L, L]
+		Shape of "value" is [nbatches, 8, L, 64]
+		Shape of matmul(p_attn, value) is [nbatches, 8, L, 64]	
+
+		We have 8 heads done with different matmul -> Get different "representation subspace"
+	'''
+	scores = torch.matmul(query, key.transpose(-2, -1) / math.sqrt(d_k))
+	if mask is not None:
+    '''
+        Mask should be 0 / 1
+    '''
+		scores = scores.masked_fill(mask == 0, -1e9)
+	p_attn = F.softmax(scores, dim = -1)
+	if dropout is not None:
+		p_attn = dropout(p_attn)
+	return torch.matmul(p_attn, value), p_attn
+
+
 class MultiHeadAttention(nn.Module):
 	def __init__(self, h, d_model, dropout = 0.1):
 		super(MultiHeadAttention, self).__init__()
@@ -215,7 +259,7 @@ class MultiHeadAttention(nn.Module):
 			We assume d_k always equal to d_v
 		'''
 		'''
-			h = 8: We have 8 parallel attention layers / "heads"
+			h = 8: We have 8 parallel attention layers, aka "heads"
 			For each layer/head: We use d_k = d_v = d_model / h = 512 / 8 = 64
 			dropout rate = 0.1
 		'''
@@ -228,7 +272,7 @@ class MultiHeadAttention(nn.Module):
 
 	def forward(self, query, key, value, mask=None):
 		if mask is not None:
-			mask = mask.unsqueeze(1)
+			mask = mask.unsqueeze(1) # Expand dimension
 		nbatches = query.size(0)
 
 		'''
@@ -250,28 +294,6 @@ class MultiHeadAttention(nn.Module):
 		return self.linear[-1](x)
 		
 
-def attention(query, key, value, mask=None, dropout=None):
-	''' 
-		Compute "Scaled Dot Product Attention"
-	'''
-	d_k = query.size(-1)
-	'''
-		query * key.transpose(-2, -1):
-			[nbatches, 8, L, 64] * [nbatches, 8, 64, L] = [nbatches, 8, L, L]
-		Do softmax to scores
-		Shape of "p_attn" is [nbatches, 8, L, L]
-		Shape of "value" is [nbatches, 8, L, 64]
-		Shape of matmul(p_attn, value) is [nbatches, 8, L, 64]	
-
-		We have 8 heads done with different matmul -> Get different "representation subspace"
-	'''
-	scores = torch.matmul(query, key.transpose(-2, -1) / math.sqrt(d_k))
-	if mask is not None:
-		scores = scores.masked_fill(mask == 0, -1e9)
-	p_attn = F.softmax(scores, dim = -1)
-	if dropout is not None:
-		p_attn = dropout(p_attn)
-	return torch.matmul(p_attn, value), p_attn
 		
 
 
@@ -300,6 +322,12 @@ class PositionwiseFeedForward(nn.Module):
 	'''	
 	'''
 		FFN(x) = max(0, w_1*x + b1)*w_2 + b_2
+
+        The dimensions of Input tensor and Output tensor is d_model,
+        The dimension of context tensor is d_ff, we let d_ff bigger than d_model, let FFN capture more data 
+        from d_model.
+
+        We use d_model = 512, d_ff = 512 * 4 = 2048
 	'''
 	def __init__(self, d_model, d_ff, dropout=0.1):
 		super(PositionwiseFeedForward, self).__init__()
@@ -390,5 +418,12 @@ def make_model(src_vocab, tgt_vocab, N = 6, d_model = 512, d_ff = 2048, h = 8, d
 			nn.init.xavier_uniform(p)
 	return model
 
+# The dimension changes between encoder and decoder
 
-
+## 1. The inputs of decoder are known.
+## 2. Decoder can generate all the outputs at one feed-forward operation.
+## 3. The shape of outputs from decoder is [maxlen_tgt, d_model]
+## 4. Multiply with the pre-softmax linear layer [d_voca, d_model] ##(Be treated as word embedding,
+# weight can be shared with the input embedding)
+## 5. We have the distribution:
+	# P(d_voca, maxlen_tgt) = W(d_voca, d_model) * Xt(maxlen_tgt, d_model)
