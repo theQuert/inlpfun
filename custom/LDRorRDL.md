@@ -69,8 +69,8 @@
     - __init__
     - forward: Build 3 sublayers with "SublayerConnection", including "Self-Attention", "Encoder-Decoder Attention"              , and "Feed Forward"
 
-    - subsequent_mask: "Lower Triangular Matrix", used to prevent the model "see the future"
-        # Then, we change the 0 to 1e-9, cause the 1e-9 would close to 0 after passing through softmax
+    - subsequent_mask: "Lower Triangular Matrix", used to prevent the model "see the future"     
+         Then, we change the 0 to 1e-9, cause the 1e-9 would close to 0 after passing through softmax
  
 ### def - Attention
 - attention
