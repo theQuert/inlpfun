@@ -2,16 +2,13 @@ import torch
 import torch.nn.functional as F
 # Build the lookup table (Embeddings)
 # nn.Embeddings(num_embedding, embedding_dim)
-# d_model = 512
+# d_model = 512, haeds = 8, d_k = d_v = 512/8 = 64
 class Embeddings(nn.Module):
 	def __init__(self, d_model, vocab):
 		super(Embeddings, self).__init__()
 		self.lut = Embedding(vocab, d_model)
 		self.d_model = d_model
-
-'''
     
-'''
 	def forward(self, x):
 		return self.lut(x) * math.sqrt(self.d_model)
 
@@ -37,8 +34,8 @@ class PositionalEncoding(nn.Module)
 	def forward(self, x):
 		x = x + Variable(self.pe[:, :x.size(1)], requires_grad = False)
 		return self.dropout(x)
+
 # Input Tensor (Word Embedding + Position Embedding = Word Representation) (batch_size, seq_len, d_model)
-# d_model = 512
 class EncoderDecoder(nn.Module):
 	def __init__(self, encoder, decoder, src_embed, tgt_embed, generator):
 		super(EncoderDecoder, self).__init__()
@@ -100,6 +97,7 @@ class SublayerConnection(nn.Module):
 	def forward(self, x, sublayer):
 		'''  
             LayerNorm(Residual Connection + Dropout)
+            R -> D -> L ** LayerNorm(sublayer(x + self.norm(x)))
 		'''
 		return x + self.dropout(sublayer(self.norm(x)))
 
@@ -135,8 +133,9 @@ class EncoderLayer(nn.Module):
         '''
             Deep copy 2 SublayerConnection, 1) one for attention, 2) the other one for simple feed-forward NN
         '''
-		self.sublayer = clones(SublayerConnection(size, dropout), 2)
 		self.size = size
+		self.sublayer = clones(SublayerConnection(size, dropout), 2)
+
 	'''
 		Attention and Feed_forward
 	'''
@@ -157,13 +156,14 @@ class EncoderLayer(nn.Module):
 		fully connected feed-forward network
 	'''
 	'''
-		Sub-layers includes [Multi-Head + Residual Connection + sublayer(dropout)+ LayerNorm]
-							[Feed Forward + Residual Connection + sublayer(dropout) + LayerNorm]
+		Sub-layers includes [Self-attention + LayerNorm + sublayer(dropout) + Residual Connection]
+							[Feed Forward + LayerNorm + sublayer(dropout) + Residual Connection ]
 	'''
 	'''
-		1. Multi-Head Attention / Feed Forward 
-		2. Residual Connection
-		3. LayerNorm
+		1. Multi-Head Attention / Self-Attention / Feed Forward 
+		2. LayerNorm
+		3. sublayer(dropout)
+        4. Residual Connection
 	'''
 	'''
 		size: d_model, we use 512
@@ -176,16 +176,16 @@ class EncoderLayer(nn.Module):
 	'''
 		Decoder is composed of a stack of N = 6 identical layers
 	'''
-	def Decoder(nn.Module):
-		def __init__(self, layer, N):
-			super(Decoder, self).__init__()
-			self.layers = clones(layer, N)
-			self.norm = LayerNorm(layer.size)
+class  Decoder(nn.Module):
+	def __init__(self, layer, N):
+		super(Decoder, self).__init__()
+		self.layers = clones(layer, N)
+		self.norm = LayerNorm(layer.size)
 		
-		def forward(self, x, memory, src_mask, tgt_mask):
-			for layer in self.layers: # Add memory, src_mask, tgt_mask for self-attention and Encoder-Decoder Attention
-				x = layer(x, memory, src_mask, tgt_mask)
-			return self.norm(x)
+	def forward(self, x, memory, src_mask, tgt_mask):
+		for layer in self.layers: # Add memory, src_mask, tgt_mask for self-attention and Encoder-Decoder Attention
+			x = layer(x, memory, src_mask, tgt_mask)
+		return self.norm(x)
 
 	'''
 		In addition to the two sub-layers in each encoder layer, the decoder
@@ -202,15 +202,20 @@ class DecoderLayer(nn.Module):
 	def __init__(self, size, self_attn, src_attn, feed_forward, dropout):
 		super(DecoderLayer, self).__init__()
 		self.size = size
-		self.self_attn = self_attn
-		self.src_attn = src_attn
+		self.self_attn = self_attn # Self-Attention from Encoder
+		self.src_attn = src_attn   # Attention for Decoder (Encoder-Decoder Attention)
 		self.feed_forward = feed_forward
 		self.sublayer = clones(SublayerConnection(size, dropout), 3)
 
 	def forward(self, x, memory, src_mask, tgt_mask):
 		m = memory
+        # Masked Multi-Head Attention, to prevent the model pre-seen the words which need the prediction.
+        # The "Masked" is used to prevent the model "seen the future", the "subsequent mask" is "Lower triangular
+        # matrix"
 		x = self.sublayer[0](x, lambda x: self.self_attn(x, x, x, tgt_mask))
+        # Encoder-Decoder Multi-head Attention
 		x = self.sublayer[1](x, lambda x: self.src_attn(x, m, m, src_mask))
+        # "Linear Transform" and "Softmax" are put behind sublayer[3], to predict the prob of tokens
 		return self.sublayer[2](x, self.feed_forward)
 
 	''' 
@@ -219,6 +224,8 @@ class DecoderLayer(nn.Module):
 	'''
 	def subsequent_mask(size):
 		attn_shape = (1, size, size)
+        # "subsequent_mask" is used for prevent decoder "see the future", and when the masks are not empty, 
+        # we change 0 to 1e-9, then the 1e-9 would be closed after passing through Softmax
 		subsequent_mask = np.triu(np.ones(attn_shape), k = 1).astype('uint8')
 		return torch.from_numpy(subsequent_mask) == 0
 
@@ -244,6 +251,7 @@ def attention(query, key, value, mask=None, dropout=None):
     '''
         Mask should be 0 / 1
     '''
+    # we change 0 to 1e-9, then the 1e-9 would be closed after passing through Softmax
 		scores = scores.masked_fill(mask == 0, -1e9)
 	p_attn = F.softmax(scores, dim = -1)
 	if dropout is not None:
@@ -345,10 +353,6 @@ class PositionwiseFeedForward(nn.Module):
 		2) Encoder-Decoder Attention
 		3) LinearLayer, used to predict probabilities of words
 '''
-
-	if mask is not None:
-		scores = scores.masked_fill(mask == 0, -1e9)
-
 class DecoderLayer(nn.Module):
 	'''
 		Decoder includes self-attn, src_attn, and feed forward
