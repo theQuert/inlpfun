@@ -1,0 +1,15 @@
+# Remove HTML
+
+# Remove puctuation
+- import string
+
+# Remove stopwords
+- from nltk.corpus import stopwords
+
+# Tokenization
+- from nltk.tokenize import RegexpTokenizer
+
+# Lemmatization or Stemming
+- from nltk.stem import WordNetLemmatizer
+- from nltk.stem.porter import PorterStemmer
+
