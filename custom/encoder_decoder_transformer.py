@@ -431,3 +431,11 @@ def make_model(src_vocab, tgt_vocab, N = 6, d_model = 512, d_ff = 2048, h = 8, d
 # weight can be shared with the input embedding)
 ## 5. We have the distribution:
 	# P(d_voca, maxlen_tgt) = W(d_voca, d_model) * Xt(maxlen_tgt, d_model)
+
+# Projection:
+	# 1) d_k = d_v = d = d_model / h = 512 / 8 = 64
+	# 2) Project original dimension d_model -> d / h
+	# 3) If the sequence length are n * n, each neuron has n * n possible values in consideration
+	# 4) After projection, num_params are 2* n * (d / h)  
+	# 5) We need to approach 2 * n * (d / h) to (n * n), but 2nd/h << n^2, and it's prone to be when h is large.
+	# 6) We have low-dimension bottleneck
