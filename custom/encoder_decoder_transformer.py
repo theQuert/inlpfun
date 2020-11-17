@@ -439,3 +439,4 @@ def make_model(src_vocab, tgt_vocab, N = 6, d_model = 512, d_ff = 2048, h = 8, d
 	# 4) After projection, num_params are 2* n * (d / h)  
 	# 5) We need to approach 2 * n * (d / h) to (n * n), but 2nd/h << n^2, and it's prone to be when h is large.
 	# 6) We have low-dimension bottleneck
+	
