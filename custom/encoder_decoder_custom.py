@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 # Build the lookup table (Embeddings)
 # nn.Embeddings(num_embedding, embedding_dim)
-# d_model = 512, haeds = 8, d_k = d_v = 512/8 = 64
+# d_model = 768, haeds = 12, d_k = d_v = 768/12 = 64
 class Embeddings(nn.Module):
 	def __init__(self, d_model, vocab):
 		super(Embeddings, self).__init__()
@@ -166,7 +166,7 @@ class EncoderLayer(nn.Module):
         4. Residual Connection
 	'''
 	'''
-		size: d_model, we use 512
+		size: d_model, we use 768
 		self_attn: The instance of "MultiHeadAttention", sublayer[0]
 		feed_forward: The instance of "PositionwiseFeedForward", sublayer[1]
 		dropout: The dropout rate, nn.Dropout
@@ -238,13 +238,13 @@ def attention(query, key, value, mask=None, dropout=None):
 	d_k = query.size(-1)
 	'''
 		query * key.transpose(-2, -1):
-			[nbatches, 8, L, 64] * [nbatches, 8, 64, L] = [nbatches, 8, L, L]
+			[nbatches, 12, L, 64] * [nbatches, 12, 64, L] = [nbatches, 12, L, L]
 		Do softmax to scores
-		Shape of "p_attn" is [nbatches, 8, L, L]
-		Shape of "value" is [nbatches, 8, L, 64]
-		Shape of matmul(p_attn, value) is [nbatches, 8, L, 64]	
+		Shape of "p_attn" is [nbatches, 12, L, L]
+		Shape of "value" is [nbatches, 12, L, 64]
+		Shape of matmul(p_attn, value) is [nbatches, 12, L, 64]	
 
-		We have 8 heads done with different matmul -> Get different "representation subspace"
+		We have 12 heads done with different matmul -> Get different "representation subspace"
 	'''
 	scores = torch.matmul(query, key.transpose(-2, -1) / math.sqrt(d_k))
 	if mask is not None:
@@ -268,7 +268,7 @@ class MultiHeadAttention(nn.Module):
 		'''
 		'''
 			h = 8: We have 8 parallel attention layers, aka "heads"
-			For each layer/head: We use d_k = d_v = d_model / h = 512 / 8 = 64
+			For each layer/head: We use d_k = d_v = d_model / h = 768 / 12 = 64
 			dropout rate = 0.1
 		'''
 		
@@ -288,12 +288,12 @@ class MultiHeadAttention(nn.Module):
 				lambda x: self.self_attn(x, x, x, mask)
 
 			"x" is the embedding of initialized sentence or previous layer output from EncoderLayer
-			Shape of "query": [nbatches, L, d_model] = [nbatches, L, 512]
+			Shape of "query": [nbatches, L, d_model] = [nbatches, L, 768]
 		'''
 		'''
-			0) Do linear transform to "query", "key", "value" -> Shape of them: [nbatches, L, 512]
-			1) Use "view()" to reshape -> Shape of them: [nbatches, L, 8, 64], d_k = 512 / 8 = 64
-			2) Use "transpose()" to swap dim_1 and dim_2 -> Shape of them: [nbatches, 8, L, 64]
+			0) Do linear transform to "query", "key", "value" -> Shape of them: [nbatches, L, 768]
+			1) Use "view()" to reshape -> Shape of them: [nbatches, L, 12, 64], d_k = 768 / 12 = 64
+			2) Use "transpose()" to swap dim_1 and dim_2 -> Shape of them: [nbatches, 12, L, 64]
 		'''
 		query, key, value = [l(x)view(nbatches, -1, self.h, self.d_k).transpose(1, 2)
 							for l, x in zip(self.linears, (query, key, value))]
@@ -301,27 +301,23 @@ class MultiHeadAttention(nn.Module):
 		x = x.transpose(1, 2).contiguous().view(nbatches, -1, self.h * self.d_k)
 		return self.linear[-1](x)
 		
-
-		
-
-
 '''
-	query: [nbatches, L, 512]
+	query: [nbatches, L, 768]
 	We have 8 heads: 
-	512 / 8 = 64
-	The shape of query, key, value are [nbatches, L, 8, 64]
-	Then transpose(1, 2) -> [nbatches, 8, L, 64]
-	The shapes of query, key, value are [nbatches, 8, L, 64]
+	768 / 12 = 64
+	The shape of query, key, value are [nbatches, L, 12, 64]
+	Then transpose(1, 2) -> [nbatches, 12, L, 64]
+	The shapes of query, key, value are [nbatches, 12, L, 64]
 
 	query * key.transpose(-1, -2)
-	[nbatches, 8, L, 64] * [nbatches, 8, 64, L] = [nbatches, 8, L, L]
+	[nbatches, 12, L, 64] * [nbatches, 12, 64, L] = [nbatches, 12, L, L]
 	p_attn = F.softmax(scores)
-	The shape of p_attn = [nbatches, 8, L, L]
-	The shape of value is [nbatches, 8, L, 64]
+	The shape of p_attn = [nbatches, 12, L, L]
+	The shape of value is [nbatches, 12, L, 64]
 
-	[nbatches, L, 512] [nbatches, L, 8, 64] [nbatches, 8, L, 64]
-	[nbatches, 8, L, 64] * [nbatches, 8, 64, L] = [nbatches, 8, L, L]
-	[nbatches, 8, L, L] * [nbatches, 8, L, 64] = [nbatches, 8, L, 64]
+	[nbatches, L, 768] [nbatches, L, 12, 64] [nbatches, 12, L, 64]
+	[nbatches, 12, L, 64] * [nbatches, 12, 64, L] = [nbatches, 12, L, L]
+	[nbatches, 12, L, L] * [nbatches, 12, L, 64] = [nbatches, 12, L, 64]
 '''
 class PositionwiseFeedForward(nn.Module):
 	'''
@@ -335,7 +331,7 @@ class PositionwiseFeedForward(nn.Module):
         The dimension of context tensor is d_ff, we let d_ff bigger than d_model, let FFN capture more data 
         from d_model.
 
-        We use d_model = 512, d_ff = 512 * 4 = 2048
+        We use d_model = 768, d_ff = 768 * 4 = 3072
 	'''
 	def __init__(self, d_model, d_ff, dropout=0.1):
 		super(PositionwiseFeedForward, self).__init__()
@@ -432,7 +428,7 @@ class Generator(nn.Module):
          return z
 
 # Full Model
-def make_model(src_vocab, tgt_vocab, N = 6, d_model = 512, d_ff = 2048, h = 8, dropout = 0.1):
+def make_model(src_vocab, tgt_vocab, N = 12, d_model = 768, d_ff = 3072, h = 8, dropout = 0.1):
 	'''
 		Produce model with hyperparameters
 	'''
@@ -468,7 +464,7 @@ def make_model(src_vocab, tgt_vocab, N = 6, d_model = 512, d_ff = 2048, h = 8, d
 	# P(d_voca, maxlen_tgt) = W(d_voca, d_model) * Xt(maxlen_tgt, d_model)
 
 # Projection:
-	# 1) d_k = d_v = d = d_model / h = 512 / 8 = 64
+	# 1) d_k = d_v = d = d_model / h = 768 / 12 = 64
 	# 2) Project original dimension d_model -> d / h
 	# 3) If the sequence length are n * n, each neuron has n * n possible values in consideration
 	# 4) After projection, num_params are 2* n * (d / h)  
