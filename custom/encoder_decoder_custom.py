@@ -2,7 +2,7 @@ import torch
 import torch.nn.functional as F
 # Build the lookup table (Embeddings)
 # nn.Embeddings(num_embedding, embedding_dim)
-# d_model = 768, haeds = 12, d_k = d_v = 768/12 = 64
+# d_model = 768, heads = 12, d_k = d_v = 768/12 = 64
 class Embeddings(nn.Module):
 	def __init__(self, d_model, vocab):
 		super(Embeddings, self).__init__()
