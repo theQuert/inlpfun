@@ -1,0 +1,304 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <title>Hsuan-Tien Lin > Courses > Data Structures and Algorithms, Spring 2020</title>
+    <style type="text/css">
+    BODY {background:#dfd; font-family:sans-serif}
+    DIV.center {text-align:center}
+    </style>
+  </head>
+  <body>
+
+<DIV class="center">
+<H2>Hsuan-Tien Lin</H2>
+<H3>
+<a href="http://www.csie.ntu.edu.tw/~htlin/">
+Home</a>
+|
+<a href="http://www.csie.ntu.edu.tw/~htlin/mooc/">
+MOOCs</a>
+|
+<a href="http://www.csie.ntu.edu.tw/~htlin/course/">
+Courses</a>
+|
+<a href="http://learner.csie.ntu.edu.tw">
+Research Group</a>
+|
+<a href="http://www.csie.ntu.edu.tw/~htlin/award/">
+Awards</a>
+|
+<a href="http://www.csie.ntu.edu.tw/~htlin/paper/">
+Publications</a>
+|
+<a href="http://www.csie.ntu.edu.tw/~htlin/talk/">
+Presentations</a>
+|
+<a href="http://www.csie.ntu.edu.tw/~htlin/program/">
+Programs/Data</a>
+</H3>
+</DIV>
+<HR>
+
+<h2><a href="http://www.csie.ntu.edu.tw/~htlin/course/dsa20spring/">Data Structures and Algorithms</a></h2>
+
+<h3>Course Description</h3>
+<p> Good program comes from appropriately using the "resources" on the computer. There are two types of
+key resources: computational units (CPU, FPU, etc.) and storage units (memory, disk, etc., along with channels and networks).
+Data Structures and Algorithms discuss how to use those two types of resources suitably and effectively. Traditionally,
+data structures aim at the use of storage units, while algorithms aim at the use of computational units.
+But the two aims are actually inseparable: succinct data structures require coupling with corresponding algorithms;
+efficient algorithms require coupling with corresponding data structures. The course, designed
+as a required course for NTU CSIE students in the freshman year, introduces
+basic data structures and their corresponding algorithms. We will move
+from the concrete side of implementing basic data structures
+to the abstract side of analyzing the complexity of storage and computation.
+
+<h3>Course Information</h3>
+<ul>
+<li>Instructor:
+  <a href="http://www.csie.ntu.edu.tw/~htlin">Hsuan-Tien Lin</a> (htlin AT csie DOT ntu DOT edu DOT tw)<br>
+office hour: after classes, R102; or by appointment, R314
+<li>TAs (as shown below): dsa_ta AT csie DOT ntu DOT edu DOT tw
+<li>TA office hours at CSIE Basement (Red Sofa): 
+<ul>
+  <li>陳佳佑: Monday 18:00--19:00 (Virtual, see forum for Google Meet Code)
+  <li>吳崇維: Tuesday 16:20--17:20
+  <li>李鈺昇: Wednesday 16:30--17:30
+  <li>周侑廷: Thursday 15:00--16:00
+  <li>楊皓丞: Friday 15:30--16:30
+</ul>
+<b>TA hours on holidays are by default canceled, unless otherwise announced</b>
+<li>Time: Tuesdays 13:20--16:10 (will take one 10-min break in between, which means teaching 10-min more per week to make up for the shorter semester)
+<li>Room: R102
+<li>CEIBA: <a href="http://ceiba.ntu.edu.tw/1082dsa01">http://ceiba.ntu.edu.tw/1082dsa01</a>
+<li>Facebook Discussion Forum: <a href="https://www.facebook.com/groups/605789706938067">https://www.facebook.com/groups/605789706938067</a>
+<li>Textbook: 
+  <a href="http://as.wiley.com/WileyCDA/WileyTitle/productCd-EHEP001657.html">Data Structures and Algorithms in C++, 2nd Edition by Goodrich, Tamassia and Mount</a>
+<li>Course <a href="doc/policy.pdf">policy</a>
+<li><a href="https://forms.gle/ETFC3AsQXW2GYYFU7">Signup</a> form, with waiting list <a href="https://bit.ly/2vGAt98">here</a>
+<li><a href="https://www.youtube.com/playlist?list=PLXVfgk9fNX2Kda9rttSvGROCtRQ3Sb8bA">Youtube playlist</a>
+</ul>
+
+<h3>Announcements</h3>
+<ul>
+  <li><a href="hw6">homework 6</a> announced on 05/20/2020
+  <li><a href="hw5">homework 5</a> announced on 05/12/2020
+  <li><a href="project">final project</a> announced on 04/29/2020
+  <li><a href="hw4">homework 4</a> announced on 04/28/2020
+  <li><a href="hw3">homework 3</a> announced on 04/15/2020
+  <li><a href="hw2">homework 2</a> announced on 03/25/2020
+  <li><a href="hw1">homework 1</a> announced on 03/09/2020
+  <li>screencast link is <a href="screencast.php">here</a>
+  <li>announcement about <a href="doc/0302_remote.php">remote teaching</a>
+</ul>
+
+<h3>Course Plan</h3>
+<TABLE border=1>
+<TR><TD>date</TD><TD>syllabus</TD><TD>plan</TD><TD>documents and reading assignments</TD></TR>
+<TR>
+  <TD>03/03</TD>
+  <TD>class introduction, DSA introduction</TD>
+  <TD></TD>
+  <TD>
+    <ul>
+      <li>introduction (<a href="doc/0303_intro.pdf">slides</a>, <a href="https://youtu.be/G3H-L-K9kM4">youtube</a>)
+      <li>DSA (<a href="doc/0303_dsa.pdf">slides</a>, <a href="doc/0303_dsa_note.pdf">notes</a>, <a href="https://youtu.be/8IOv2fnc01E">youtube</a>)
+      <li><a href="doc/proof_getmin.pdf">sample proof for correctness of getMinIndex</a>
+    </ul>
+  </TD>
+</TR>
+<TR>
+  <TD>03/10</TD>
+  <TD>C++ introduction (Chapter 1) and array (Section 3.1)</TD>
+  <TD>homework 1 announced</TD>
+  <TD>
+    <ul>
+      <li>C++ (<a href="doc/0303_cpp.pdf">slides</a>, <a href="doc/0303_cpp_note.pdf">notes</a>, <a href="https://youtu.be/1yyu70Vy9Zc">youtube</a>)
+      <li>array (<a href="doc/0310_array.pdf">slides</a>, <a href="https://youtu.be/1yyu70Vy9Zc?t=5145">youtube</a>)
+      <li>reading assignments: Chapter 1 and Section 3.1
+    </ul>
+  </TD>
+</TR>
+<TR>
+  <TD>03/17</TD>
+  <TD>array (Section 3.1) and linked list (Section 3.2)</TD>  
+  <TD></TD>
+  <TD>
+    <ul>
+      <li>array (<a href="doc/0310_array.pdf">slides</a>, <a href="https://youtu.be/B0ywTK-Lklw">youtube</a>)
+      <li>linked list (<a href="doc/0317_llist.pdf">slides</a>, <a href="doc/0317_llist_note.pdf">notes</a>, <a href="https://youtu.be/B0ywTK-Lklw?t=5544">youtube</a>)
+      <li><a href="doc/proof_bsearch.pdf">sample proof for finiteness of BinarySearch</a>
+      <li>reading assignments: Sections 3.1 and 3.2
+    </ul>
+  </TD>
+</TR>
+<TR>
+  <TD>03/24</TD>
+  <TD>linked list (Sections 3.2, 3.3, 3.4), recursion (Section 3.5), analysis tools (Chapter 4)</TD>
+  <TD>homework 1 due; homework 2 announced</TD>
+  <TD>
+    <ul>
+      <li>linked list (<a href="doc/0317_llist.pdf">slides</a>, <a href="doc/0324_llist_note.pdf">notes</a>, <a href="https://youtu.be/pAs8Swu1Y3Y">youtube</a>)
+      <li>analysis tools (<a href="doc/0324_analysis.pdf">slides</a>, <a href="doc/0324_analysis_note.pdf">notes</a>, <a href="https://youtu.be/d-PDYIqg_Kc">youtube</a>)
+      <li>reading assignments: Sections 3.2, 3.3, 3.4 and 3.5
+    </ul>
+  </TD>
+</TR>
+<TR>
+  <TD>03/31</TD>
+  <TD>analysis tools (Chapter 4), stack (Section 5.1)</TD>
+  <TD></TD>
+  <TD>
+    <ul>
+      <li>analysis tools (<a href="doc/0324_analysis.pdf">slides</a>, <a href="doc/0331_analysis_note.pdf">notes</a>, <a href="https://youtu.be/-1FYYVpgyUo">youtube</a>)
+      <li>stack (<a href="doc/0331_stack.pdf">slides</a>, <a href="doc/0331_stack_note.pdf">notes</a>, <a href="https://youtu.be/-1FYYVpgyUo?t=8034">youtube</a>)
+      <li>reading assignments: Chapter 4 and Section 5.1
+    </ul>
+  </TD>
+</TR>
+<TR>
+  <TD>04/07</TD>
+  <TD>stack (Sections 5.1) and queue (Sections 5.2 and 5.3)</TD>
+  <TD></TD>
+  <TD>
+    <ul>
+      <li>stack (<a href="doc/0331_stack.pdf">slides</a>, <a href="doc/0407_stack_note.pdf">notes</a>, <a href="https://youtu.be/R0MpXbuqfZM">youtube</a>)
+      <li>queue (<a href="doc/0407_queue.pdf">slides</a>, <a href="doc/0407_queue_note.pdf">notes</a>, <a href="https://youtu.be/R0MpXbuqfZM?t=6542">youtube</a>)
+      <li>reading assignments: Chapter 5
+    </ul>
+  </TD>
+</TR>
+<TR>
+  <TD>04/14</TD>
+  <TD>container/iterator (Chapter 6)</TD>
+  <TD>homework 2 due; homework 3 announced</TD>
+  <TD>
+    <ul>
+      <li>container (<a href="doc/0414_contain.pdf">notes</a> from past, <a href="doc/0414_contain_doodle.pdf">notes</a> from class, <a href="https://youtu.be/USLvdBuxTno">youtube</a>)
+      <li>reading assignments: Chapter 6
+    </ul>    
+  </TD>
+</TR>
+<TR>
+  <TD>04/21</TD>
+  <TD>tree (Chapter 7)</TD>
+  <TD>final project announced</TD>
+  <TD>
+    <ul>
+      <li>tree (<a href="doc/0421_tree.pdf">notes</a> from past, <a href="doc/0421_tree_doodle.pdf">notes</a> from class, <a href="https://youtu.be/XkNIHYd9Ruc">youtube</a>)
+      <li>reading assignments: Chapter 7
+    </ul>
+  </TD>
+</TR>
+<TR>
+  <TD>04/28</TD>
+  <TD>heap (Chapter 8)</TD>
+  <TD>homework 4 announced</TD>
+  <TD>
+    <ul>
+      <li>tree (<a href="doc/0421_tree.pdf">notes</a> from past, <a href="doc/0428_tree_doodle.pdf">notes</a> from class, <a href="https://youtu.be/RjvhXL0WTrY">youtube</a>)
+      <li>heap (<a href="doc/0428_heap.pdf">notes</a> from past, <a href="doc/0428_heap_doodle.pdf">notes</a> from class, <a href="https://youtu.be/RjvhXL0WTrY?t=3340">youtube</a>)
+      <li>reading assignments: Chapter 8
+    </ul>
+  </TD>
+</TR>
+<TR>
+  <TD>05/05</TD>
+  <TD>binomial heap / hash table (Sections 9.1, 9.2, 9.3)</TD>
+  <TD>homework 3 due</TD>  
+  <TD>
+    <ul>
+      <li>binomial heap (<a href="doc/0505_binheap.pdf">notes</a> from past, <a href="doc/0505_binheap_doodle.pdf">notes</a> from class, <a href="https://youtu.be/SBQLkYIDAZI">youtube</a>)
+      <li>hash table (<a href="doc/0505_hash.pdf">notes</a> from past, <a href="doc/0505_hash_doodle.pdf">notes</a> from class, <a href="https://youtu.be/SBQLkYIDAZI?t=6975">youtube</a>)
+      <li>reading assignments: Sections 9.1, 9.2, 9.3
+    </ul>
+  </TD>
+</TR>
+<TR>
+  <TD>05/12</TD>
+  <TD>hash table (Section 9.2)</TD>
+  <TD>homework 5 announced</TD>
+  <TD>
+    <ul>
+      <li>hash table (<a href="doc/0512_hash.pdf">notes</a> from past, <a href="doc/0512_hash_doodle.pdf">notes</a> from class, <a href="https://youtu.be/WX-z52QweUs">youtube</a>)
+      <li>reading assignments: Sections 9.1, 9.2, 9.3
+    </ul>	
+  </TD>
+</TR>
+<TR>
+  <TD>05/19</TD>
+  <TD>skip list / binary search tree / AVL tree (Sections 9.4, 10.1, 10.2)</TD>
+  <TD>homework 4 due; homework 6 announced</TD>
+  <TD>
+    <ul>
+      <li>skip list (<a href="doc/0519_skiplist.pdf">notes</a> from past, <a href="doc/0519_skiplist_doodle.pdf">notes</a> from class, <a href="https://youtu.be/Lzr5-m7ap-8">youtube</a>)
+      <li>binary search tree / AVL tree (<a href="doc/0519_bst.pdf">notes</a> from past, <a href="doc/0519_bst_doodle.pdf">notes</a> from class, <a href="https://youtu.be/Lzr5-m7ap-8?t=3658">youtube</a>)
+      <li>reading assignments: Sections 9.4, 10.1
+    </ul>	
+  </TD>
+</TR>
+<TR>
+  <TD>05/26</TD>
+  <TD>AVL tree / 2-3-4 tree / red-black tree (Sections 10.2, 10.4, 10.5)</TD>
+  <TD></TD>
+  <TD>
+    <ul>
+      <li>AVL tree (<a href="doc/0526_avl.pdf">notes</a> from past, <a href="doc/0526_avl_doodle.pdf">notes</a> from class, <a href="https://youtu.be/cH8nH0Enjhw">youtube</a>)
+      <li>(2, 3, 4)-tree / red-black tree (<a href="doc/0526_rb.pdf">notes</a> from past, <a href="doc/0526_rb_doodle.pdf">notes</a> from class, <a href="https://youtu.be/cH8nH0Enjhw?t=3697">youtube</a>)
+      <li>reading assignments: Sections 10.2, 10.4, 10.5
+    </ul>	    
+  </TD>
+</TR>
+<TR>
+  <TD>06/02</TD>
+  <TD>(2, 3, 4)-tree / red-black tree (Sections 10.4, 10.5)</TD>
+  <TD></TD>
+  <TD>
+    <ul>
+      <li>(2, 3, 4)-tree / red-black tree (<a href="doc/0526_rb.pdf">notes</a> from past, notes from class [forgot to save, sorry!], <a href="https://youtu.be/gqphGLSGyQ4">youtube</a>)
+      <li>reading assignments: Sections 10.4, 10.5
+    </ul>	        
+  </TD>
+</TR>
+<TR>
+  <TD>06/09</TD>
+, 11.1, 11.2, 11.3  
+  <TD>sorting (Sections 11.1, 11.2, 11.3) and summary</TD>
+  <TD>homework 5 due; homework 6 due</TD>
+  <TD>
+    <ul>
+      <li>sorting (<a href="doc/0609_sorting.pdf">notes</a> from past, <a href="doc/0609_sorting_doodle.pdf">notes</a> from class, <a href="https://youtu.be/cxbabnqtWsk">youtube</a>)
+      <li>summary (<a href="doc/0609_summary.pdf">notes</a> from past, <a href="doc/0609_summary_doodle.pdf">notes</a> from class, <a href="https://youtu.be/cxbabnqtWsk?t=7825">youtube</a>)
+      <li>reading assignments: Sections 11.1, 11.2, 11.3
+    </ul>	        
+  </TD>  
+</TR>
+<TR>
+  <TD>06/16</TD>
+  <TD><b>no class</b> and good luck with your other finals</TD>
+  <TD></TD>
+  <TD></TD>
+</TR>
+<TR>
+  <TD>06/23</TD>
+  <TD>summar vacation begins (really?)</TD>
+  <TD>final project due</TD>
+  <TD></TD>
+</TR>
+</TABLE>
+
+<hr>
+<TABLE>
+<TR style="vertical-align">
+<TD style="width:450px">
+Last updated at CST 14:55, September 25, 2020<br>
+Please feel free to contact me: <img style="vertical-align:middle" src="style/htlin.email.png" alt="htlin.email.png">
+</TD>
+<TD>
+<a href="https://validator.w3.org/check/referer"><img src="http://www.w3.org/Icons/valid-html40" alt="Valid HTML 4.0!" height="31" width="88"></a>
+</TD>
+</TR>
+</TABLE>
+   
+</html>
