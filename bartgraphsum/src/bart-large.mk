@@ -5,7 +5,7 @@
 
 MAKEFILE_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 CAL_ROUGE=$(HOME)/PreSumm/src/cal_rouge.py
-BART_LARGE=$(HOME)/fairseq/models/bart.large/model.pt
+BART_LARGE=./fairseq/models/bart.large/model.pt
 OUTPUT_DIR=output
 CHECKPOINT=$(OUTPUT_DIR)/checkpoint_best.pt
 
@@ -17,9 +17,9 @@ MAX_EPOCH=5
 UPDATE_FREQ=4
 RESTORE_FILE=$(BART_LARGE)
 
-CUDA_VISIBLE_DEVICES=0,1,2,3
-NUM_GPUS=4
-THREADS=32
+CUDA_VISIBLE_DEVICES=0
+NUM_GPUS=1
+THREADS=8
 
 TEST_NAME=test
 DECODE_BATCH_SIZE=16
@@ -32,7 +32,7 @@ DEV_NAME=val
 # include $(CONFIG)
 
 # Good for overwriting machine-specific settings, e.g., CUDA_VISIBLE_DEVICES
-CONFIG_LOCAL=$(HOME)/.bart_config.mk
+CONFIG_LOCAL=./.bart_config.mk
 -include $(CONFIG_LOCAL)
 
 ifeq ($(DISABLE_VALIDATION), 1)
@@ -43,10 +43,10 @@ endif
 $(TASK)-bin: $(TASK)
 	for SPLIT in train $(DEV_NAME); do \
 	  for EXT in source target; do \
-	    python3.6 -m examples.roberta.multiprocessing_bpe_encoder --encoder-json $(HOME)/fairseq/encoder.json --vocab-bpe $(HOME)/fairseq/vocab.bpe --inputs "$(TASK)/$$SPLIT.$$EXT" --outputs "$(TASK)/$$SPLIT.bpe.$$EXT" --workers 60 --keep-empty; \
+	    /usr/bin/python3 -m fairseq.examples.roberta.multiprocessing_bpe_encoder --encoder-json ./fairseq/encoder.json --vocab-bpe ./fairseq/vocab.bpe --inputs "$(TASK)/$$SPLIT.$$EXT" --outputs "$(TASK)/$$SPLIT.bpe.$$EXT" --workers 60 --keep-empty; \
 	  done; \
 	done
-	fairseq-preprocess --source-lang "source" --target-lang "target" --trainpref "$(TASK)/train.bpe" --validpref "$(TASK)/$(DEV_NAME).bpe" --destdir "$(TASK)-bin/" --workers 60 --srcdict $(HOME)/fairseq/dict.txt --tgtdict $(HOME)/fairseq/dict.txt
+	fairseq-preprocess --source-lang "source" --target-lang "target" --trainpref "$(TASK)/train.bpe" --validpref "$(TASK)/$(DEV_NAME).bpe" --destdir "$(TASK)-bin/" --workers 60 --srcdict ./fairseq/dict.txt --tgtdict ./fairseq/dict.txt
 
 train: $(OUTPUT_DIR)/checkpoint_best.pt
 	@echo Done
@@ -61,7 +61,7 @@ $(OUTPUT_DIR)/checkpoint_best.pt: $(TASK)-bin
 	mkdir -p $(OUTPUT_DIR)
 	date > $(OUTPUT_DIR)/time-start.txt
 	CUDA_VISIBLE_DEVICES=$(CUDA_VISIBLE_DEVICES) \
-	  python3.6 fairseq/train.py $(TASK)-bin \
+	  /usr/bin/python3 fairseq/train.py $(TASK)-bin \
 	    --log-format json \
 	    --no-progress-bar \
 	    --restore-file $(RESTORE_FILE) \
@@ -95,9 +95,9 @@ rouge: $(OUTPUT_DIR)/$(TEST_NAME).rouge-stdout
 	@echo Done
 
 $(OUTPUT_DIR)/$(TEST_NAME).decoded: $(CHECKPOINT) $(TASK)/$(TEST_NAME).source
-	python3.6 $(MAKEFILE_DIR)/bart_decode_parallel.py --gpus=$(NUM_GPUS) --batch_size=$(DECODE_BATCH_SIZE) \
+	/usr/bin/python3 $(MAKEFILE_DIR)/bart_decode_parallel.py --gpus=$(NUM_GPUS) --batch_size=$(DECODE_BATCH_SIZE) \
 	  --model=$(CHECKPOINT) --min_len=$(DECODE_MIN_LEN) --max_len_b=$(DECODE_MAX_LEN) --task=$(TASK)-bin -o $@ $(TASK)/$(TEST_NAME).source
 
 $(OUTPUT_DIR)/$(TEST_NAME).rouge-stdout: $(OUTPUT_DIR)/$(TEST_NAME).decoded
-	python3.6 $(CAL_ROUGE) -p $(THREADS) -r $(TASK)/$(TEST_NAME).target -c $(OUTPUT_DIR)/$(TEST_NAME).decoded 2>$(OUTPUT_DIR)/$(TEST_NAME).rouge-stderr >$(OUTPUT_DIR)/$(TEST_NAME).rouge-stdout
+	/usr/bin/python3 $(CAL_ROUGE) -p $(THREADS) -r $(TASK)/$(TEST_NAME).target -c $(OUTPUT_DIR)/$(TEST_NAME).decoded 2>$(OUTPUT_DIR)/$(TEST_NAME).rouge-stderr >$(OUTPUT_DIR)/$(TEST_NAME).rouge-stdout
 
