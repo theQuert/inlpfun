@@ -3,7 +3,8 @@
 
 .PHONY: train decode rouge info
 
-MAKEFILE_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+# MAKEFILE_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+MAKEFILE_DIR=/content/drive/MyDrive/MDS_2/bartgraphsum/src
 CAL_ROUGE=$(HOME)/PreSumm/src/cal_rouge.py
 BART_LARGE=./fairseq/models/bart.large/model.pt
 OUTPUT_DIR=output
