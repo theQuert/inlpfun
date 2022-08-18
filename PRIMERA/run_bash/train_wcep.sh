@@ -10,13 +10,12 @@ DATA_NAME="wcep"
 MODEL_NAME="PRIMER_wcep"
 MODEL_PATH="PRIMER_wcep"
 nohup python primer_main.py  \
-                --batch_size 16 \
+                --batch_size 2 \
                 --gpus 1  \
-                --mode test \
+                --mode train \
                 --model_path ../models/$MODEL_NAME/  \
                 --dataset_name ${DATA_NAME} \
                 --primer_path ../${MODEL_PATH} \
                 --num_workers 0 \
                 --progress_bar_refresh_rate 50 \
-                --beam_size 5 \
-        > ../test_${DATA_NAME}_${MODEL_NAME}.out &
+        > ../train_${DATA_NAME}_${MODEL_NAME}.out 2>&1

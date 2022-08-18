@@ -11,7 +11,6 @@ from datasets import load_dataset, load_metric
 import json
 from transformers import (
     AutoTokenizer,
-    LEDConfig,
     get_linear_schedule_with_warmup,
     get_constant_schedule_with_warmup,
     LEDTokenizer,
@@ -56,11 +55,9 @@ class PRIMERSummarizer(pl.LightningModule):
     def __init__(self, args):
         super(PRIMERSummarizer, self).__init__()
         self.args = args
-        # self.tokenizer = AutoTokenizer.from_pretrained(args.primer_path)
-        self.tokenzier = AutoTokenizer.from_pretrained('allenai/PRIMERA')
-        self.config = LEDConfig.from_pretrained('allenai/PRIMERA')
-        # self.model = LEDForConditionalGeneration.from_pretrained(args.primer_path)
-        self.model = LEDForConditionalGeneration.from_pretrained('allenai/PRIMERA')
+
+        self.tokenizer = AutoTokenizer.from_pretrained(args.primer_path)
+        self.model = LEDForConditionalGeneration.from_pretrained(args.primer_path)
         self.model.gradient_checkpointing_enable()
         # if args.debug_mode:
         #     pdb.set_trace()
@@ -516,7 +513,7 @@ if __name__ == "__main__":
 
     ########################
     # Gneral
-    parser.add_argument("--gpus", default=0, type=int, help="number of gpas to use")
+    parser.add_argument("--gpus", default=0, type=int, help="number of gpus to use")
     parser.add_argument(
         "--accelerator", default=None, type=str, help="Type of accelerator"
     )

@@ -27,7 +27,7 @@ from dataloader import (
 )
 import json
 from pathlib import Path
-os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
+
 
 def label_smoothed_nll_loss(lprobs, target, epsilon, ignore_index=-100):
     """From fairseq"""
@@ -251,9 +251,9 @@ class PRIMERSummarizerLN(pl.LightningModule):
                 )
             )
             preds.append(pred)
-        with open('/content/drive/MyDrive/MDS/wcep_custom/bs3_test/filtered_non/gen_summ_tuned/gen_summ_tuned.test.tgt', 'a+') as f:
-            for line in generated_str:
-                f.write(line.strip()+'\n')
+        # with open('/content/drive/MyDrive/MDS/wcep_custom/baseline_1/gen_summ/gen_summ.test.tgt', 'a+') as f:
+        #     for line in generated_str:
+        #         f.write(line.strip()+'\n')
         return result_batch
 
     def validation_step(self, batch, batch_idx):
@@ -279,7 +279,7 @@ class PRIMERSummarizerLN(pl.LightningModule):
                 ]
             )
         rouge_results = pd.DataFrame(rouge_result_all, columns=names)
-        # rouge_results.to_csv('/content/drive/MyDrive/MDS/wcep_custom/bs3_test/filtered_non/gen_summ/rouge_result.csv')
+        # rouge_results.to_csv('/content/drive/MyDrive/MDS/wcep_custom/baseline_1/gen_summ/rouge_result.csv')
         avg = [rouge_results[c].mean() for c in rouge_results.columns]
         rouge_results.loc["avg_score"] = avg
         if output_file:
