@@ -1,5 +1,0 @@
-# Comparison between RoBERTa and BERT
-
-1. RoBERTa built on BERT's language masking strategy and modifies key hyperparameters in BERT.
-2. Removing BERT's "Next Sentence Pretraining", and training with "Much larger mini-batches" and "Larger Learning Rates"
-3. This allow RoBERTa representations to generalize even better to downstream tasks compared to BERT.
